@@ -75,25 +75,52 @@ def configure_page() -> None:
     st.markdown(
         """
         <style>
+        .stApp {
+            background: #0f172a;
+            color: #e5e7eb;
+        }
         .main .block-container {
             padding-top: 1.5rem;
             padding-bottom: 3rem;
         }
+        h1, h2, h3, h4, h5, h6,
+        .stMarkdown, .stCaption, label {
+            color: #e5e7eb;
+        }
         .hero {
-            border: 1px solid #d8dee9;
-            border-left: 6px solid #2563eb;
+            border: 1px solid #334155;
+            border-left: 6px solid #38bdf8;
             border-radius: 8px;
             padding: 1rem 1.2rem;
-            background: #f8fafc;
+            background: #111827;
             margin-bottom: 1rem;
+            box-shadow: 0 10px 30px rgba(2, 6, 23, .28);
         }
         .hero h1 {
             font-size: 2rem;
             margin: 0 0 .35rem 0;
+            color: #f8fafc !important;
         }
         .hero p {
             margin: 0;
-            color: #475569;
+            color: #cbd5e1 !important;
+        }
+        div[data-testid="stMetric"] {
+            background: #111827;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 8px 24px rgba(2, 6, 23, .22);
+        }
+        div[data-testid="stMetric"] label,
+        div[data-testid="stMetric"] [data-testid="stMetricLabel"] {
+            color: #cbd5e1 !important;
+        }
+        div[data-testid="stMetric"] [data-testid="stMetricValue"] {
+            color: #f8fafc !important;
+        }
+        div[data-testid="stMetric"] [data-testid="stMetricDelta"] {
+            color: #93c5fd !important;
         }
         .badge {
             display: inline-block;
@@ -102,25 +129,27 @@ def configure_page() -> None:
             font-size: .78rem;
             font-weight: 700;
             border: 1px solid transparent;
+            line-height: 1.35;
+            letter-spacing: 0;
         }
         .badge-high {
             background: #fee2e2;
-            color: #991b1b;
-            border-color: #fecaca;
+            color: #7f1d1d !important;
+            border-color: #ef4444;
         }
         .badge-medium {
-            background: #fef3c7;
-            color: #92400e;
-            border-color: #fde68a;
+            background: #ffedd5;
+            color: #7c2d12 !important;
+            border-color: #fb923c;
         }
         .badge-low {
             background: #dbeafe;
-            color: #1e40af;
-            border-color: #bfdbfe;
+            color: #1e3a8a !important;
+            border-color: #60a5fa;
         }
         .badge-none {
             background: #dcfce7;
-            color: #166534;
+            color: #14532d !important;
             border-color: #bbf7d0;
         }
         .pill {
@@ -133,16 +162,72 @@ def configure_page() -> None:
             color: #334155;
             font-size: .82rem;
         }
+        .pill, .pill * {
+            color: #334155 !important;
+        }
+        .info-card {
+            border: 1px solid #334155;
+            border-radius: 8px;
+            background: #111827;
+            color: #e5e7eb !important;
+            padding: .85rem 1rem;
+            margin-bottom: .75rem;
+            box-shadow: 0 8px 24px rgba(2, 6, 23, .18);
+        }
+        .info-card * {
+            color: #e5e7eb !important;
+        }
         .callout-high {
-            border: 1px solid #fecaca;
+            border: 1px solid #fca5a5;
             border-left: 6px solid #dc2626;
             border-radius: 8px;
             background: #fff1f2;
+            color: #7f1d1d !important;
             padding: .85rem 1rem;
             margin-bottom: .75rem;
+            box-shadow: 0 8px 24px rgba(127, 29, 29, .16);
+        }
+        .callout-high * {
+            color: #7f1d1d !important;
+        }
+        .callout-medium {
+            border: 1px solid #fdba74;
+            border-left: 6px solid #f97316;
+            border-radius: 8px;
+            background: #fff7ed;
+            color: #7c2d12 !important;
+            padding: .85rem 1rem;
+            margin-bottom: .75rem;
+            box-shadow: 0 8px 24px rgba(124, 45, 18, .14);
+        }
+        .callout-medium * {
+            color: #7c2d12 !important;
+        }
+        .callout-low {
+            border: 1px solid #93c5fd;
+            border-left: 6px solid #3b82f6;
+            border-radius: 8px;
+            background: #eff6ff;
+            color: #1e3a8a !important;
+            padding: .85rem 1rem;
+            margin-bottom: .75rem;
+            box-shadow: 0 8px 24px rgba(30, 58, 138, .12);
+        }
+        .callout-low * {
+            color: #1e3a8a !important;
+        }
+        div[data-testid="stExpander"] {
+            border-color: #334155;
+            background: #0b1220;
+            border-radius: 8px;
+        }
+        div[data-testid="stDataFrame"],
+        div[data-testid="stTable"] {
+            border-radius: 8px;
+            overflow: hidden;
         }
         .muted {
-            color: #64748b;
+            color: #94a3b8 !important;
         }
         </style>
         """,
@@ -403,6 +488,7 @@ def render_overview(artifacts: dict[str, Any]) -> None:
             st.markdown(
                 f"""
                 <div class="callout-high">
+                  {severity_badge("HIGH")}<br>
                   <strong>{high_issues} high-severity contract issue(s)</strong><br>
                   Drift detector found likely breaking API documentation mismatches.
                 </div>
@@ -519,6 +605,7 @@ def render_high_severity(result: dict[str, Any]) -> None:
     st.markdown(
         f"""
         <div class="callout-high">
+          {severity_badge("HIGH")}<br>
           <strong>{clean_text(result.get('method'), '')} {clean_text(result.get('endpoint'), '')}</strong><br>
           {len(high_issues)} high-severity issue(s) detected.
         </div>
